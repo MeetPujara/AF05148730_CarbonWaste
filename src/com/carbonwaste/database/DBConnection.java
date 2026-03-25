@@ -6,9 +6,9 @@ import java.sql.SQLException;
 
 public class DBConnection {
     // Database credentials
-    private static final String URL = "jdbc:mysql://localhost:3306/carbon_waste_db";
-    private static final String USER = "root";
-    private static final String PASS = "meet123";
+    private static final String URL = ConfigLoader.get("DB_URL");
+    private static final String USER = ConfigLoader.get("DB_USER");
+    private static final String PASS = ConfigLoader.get("DB_PASS");
 
     public static Connection getConnection() {
         Connection conn = null;
