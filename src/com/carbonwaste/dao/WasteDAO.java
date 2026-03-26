@@ -25,20 +25,27 @@ public class WasteDAO {
 
     // READ
     public void viewLogs(int id) {
-        String sql = (id == 0) ? "SELECT * FROM waste_logs" : "SELECT * FROM waste_logs WHERE id = " + id;
+        String sql = (id == 0) ? "SELECT * FROM waste_logs" : "SELECT * FROM waste_logs WHERE id = ?";
+        //if id == 0 then will print whole table else the id.
         try (Connection conn = DBConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            System.out.println("\n--- CARBON WASTE HISTORY ---");
-            while (rs.next()) {
-                System.out.printf("ID: %d | Fuel: %s | Dist: %.1f km | CO2: %.2f kg | Date: %s%n",
-                        rs.getInt("id"), rs.getString("fuel_type"),
-                        rs.getDouble("distance_km"), rs.getDouble("total_co2_kg"),
-                        rs.getTimestamp("entry_date"));
+            // If a specific ID was requested, we "plug it into" the ?
+            if (id != 0) {
+                pstmt.setInt(1, id);
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                System.out.println("\n--- CARBON WASTE HISTORY ---");
+                while (rs.next()) {
+                    System.out.printf("ID: %d | Fuel: %s | Dist: %.1f km | CO2: %.2f kg | Date: %s%n",
+                            rs.getInt("id"), rs.getString("fuel_type"),
+                            rs.getDouble("distance_km"), rs.getDouble("total_co2_kg"),
+                            rs.getTimestamp("entry_date"));
+                }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Database error: " + e.getMessage());
         }
     }
 
